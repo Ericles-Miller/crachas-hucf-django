@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse 
 from .models import Servidor
-from .forms import ServidorForm, ValidForm, rename_image
+from .forms import ServidorForm, ValidForm
 from django.core.paginator import Paginator
 
 # Create your views here.
@@ -19,12 +19,12 @@ def cadastrar(request):
         return render(request, 'cadastro.html', context=context)
     
     else:
-        form2 = ServidorForm(request.POST, request.FILES )
-        form = ValidForm(request.POST, request.FILES )
+        form2 = ServidorForm(request.POST, request.FILES)
+        form = ValidForm(request.POST, request.FILES)
         if form2.is_valid():    
             form = ValidForm()
             form2.save()
-            return redirect('inicio')
+            return redirect('lista')
         else: 
             user = Servidor.objects.all()
             context = {
@@ -37,11 +37,8 @@ def cadastrar(request):
 def listar(request):
     server = Servidor.objects.all()
     search = request.GET.get('search')
-    print('---------')
-    print(search)
     if search:
-        server = objects.filter(cpf_icontains=search)
-        rename_image(search)
+        server = Servidor.objects.filter(cpf_icontains=search)
         context = {'server': server}
         return render(request, 'lista.html', context)
     context ={

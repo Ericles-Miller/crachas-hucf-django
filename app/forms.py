@@ -3,18 +3,18 @@ from .models import Servidor
 import os
 from django.forms import ValidationError
 from django.core.validators import MinValueValidator
-from random import randint
 
 from django.forms.widgets import ClearableFileInput
 
 
 class ValidForm(forms.Form):
     nome  = forms.CharField(max_length = 100) 
-    cpf   = forms.CharField(max_length = 11)
+    cpf   = forms.CharField(max_length = 11) 
     imagem=forms.ImageField(widget=ClearableFileInput)
-
+    print(cpf)
     def clean_cpf(self):
         _cpf = self.cleaned_data['cpf']
+        print(_cpf)
         a = validar_cpf(_cpf)
         
         if a == True:
@@ -23,15 +23,24 @@ class ValidForm(forms.Form):
             else: 
                 raise ValidationError("O cpf inserido é inválido ou já existe!")
     
-    def clean_imagem(self):
-        _cpf = self.cleaned_data['cpf']
-        _imagem = self.cleaned_data['imagem']
-
-
-
-
-
-
+class ServidorForm(forms.ModelForm):
+    class Meta:
+        model = Servidor
+        fields = ('nome','cpf', 'imagem')
+        widgets = {
+            'nome': forms.TextInput(attrs={
+                'class': 'form-control',
+                'max_length': 255,
+                'placeholder': 'aaaaa'
+            }),
+            'descricao': forms.Textarea(attrs={'class': 'form-control'})
+        }
+        error_messages = {
+                'nome' :{
+                    'required': 'Campo obrigatório'
+                },
+            }
+        
 
 
 def validar_cpf(numbers):
@@ -52,25 +61,3 @@ def validar_cpf(numbers):
         if digit != cpf[i]:
             return False
     return True
-
-class ServidorForm(forms.ModelForm):
-    class Meta:
-        model = Servidor
-        fields = '__all__'
-        widgets = {
-            'nome': forms.TextInput(attrs={
-                'class': 'form-control',
-                'max_length': 255,
-                'placeholder': 'aaaaa'
-            }),
-            'descricao': forms.Textarea(attrs={'class': 'form-control'})
-        }
-        error_messages = {
-                'nome' :{
-                    'required': 'Campo obrigatório'
-                },
-            }
-        
-
-def rename_image(cpf):
-    print('llllll')
