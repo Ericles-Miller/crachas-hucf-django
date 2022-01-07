@@ -1,11 +1,12 @@
 import os, time
 from pathlib import Path
 import mysql.connector
+import shutil
 
 list_id = list()
 
 def connect():
-    com = mysql.connector.connect(host='localhost',database='crachas',user='root',password='')
+    com = mysql.connector.connect(host='localhost',database='crachas',user='root',password='', port='3307')
     return com
 def view():
     lista = []
@@ -23,10 +24,6 @@ def view():
 
     print(lista)
     if lista:
-        for i in range(len(lista)):
-            for j in range(len(list_id)):
-                if lista[i]['id'] == list_id[j]:
-                    lista.pop(i)
         rename_image(lista)
     else:
         time.sleep(300)
@@ -35,25 +32,26 @@ def view():
 def rename_image(lista):
 
     for i in range(len(lista)):
-        
+        id = lista[i]['id']   
         cpf = lista[i]['cpf']
         imagem = lista[i]['imagem']
         imagem = imagem[8:]
         
-        addrees =Path('.\cracha\imagens')
-        
+        addrees =Path(r'C:\Users\Administrador\Desktop\cracha\crachas-hucf-django\imagens')
+        new_addrees = Path(r'C:\Users\Administrador\Desktop\cracha\crachas-hucf-django\imagens_renomeadas')
         cpf = '{}.jpg'.format(cpf)
-
+        
         old_name = os.path.join(addrees, imagem)
-        new_name = os.path.join(addrees, cpf)
-        os.rename(old_name, new_name)
-        list_id.append(lista[i]['id'])
-
-    for i in range(len(lista)):
-        lista.pop(i)
-
+        new_file = os.path.join(new_addrees, imagem)
+        if not os.path.isfile(new_file):
+            shutil.copy(old_name,new_file)
+            new_name = os.path.join(new_addrees, cpf)
+            if not os.path.isfile(new_name):
+                os.rename(new_file, new_name)
+                #os.remove(new_file)
+        else:
+            os.remove(new_file)
     time.sleep(300)
     view()
-
 
 view()
